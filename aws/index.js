@@ -1,16 +1,16 @@
 'use strict';
 
-const doc = require('dynamodb-doc');
+var doc = require("dynamodb-doc");
 
 const dynamo = new doc.DynamoDB();
 
 const itemFormatter = (body) => {
-    var item = {};
-    item.UserId = body.uid;
-    item.URL = body.url;
-    item.CreatedMs = body.created;
-    return item;
-}
+    return {
+        UserId: body.uid,
+        URL: body.url,
+        CreatedMs: body.created
+    };
+};
 
 const spacingAlgo = (items) => {
     const oneDayMs = 1000 * 60 * 60 * 24; 
@@ -19,7 +19,7 @@ const spacingAlgo = (items) => {
             Math.round((new Date().getTime() - item.CreatedMs)/oneDayMs)
         ) % 1 == 0
     );
-}
+};
 
 exports.handler = (event, context, callback) => {
 
@@ -50,7 +50,7 @@ exports.handler = (event, context, callback) => {
             });
             break;
         case 'POST':
-            params.Item = itemFormatter(event.body);
+            params.Item = itemFormatter(JSON.parse(event.body));
             dynamo.putItem(params, done);
             break;
         default:
